@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <time.h>
+
 #include "ml6.h"
 #include "display.h"
 #include "draw.h"
@@ -28,6 +30,8 @@ int main(int argc, char **argv) {
   /* printf("\n"); */
   /* print_matrix(make_rotZ(M_PI/4)); */
   /* printf("\n"); */
+
+srand( time(NULL) );
 
   if ( argc == 2 )
     parse_file( argv[1], csystems, edges, polygons, s, zb );

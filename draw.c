@@ -19,8 +19,13 @@
 
   Color should be set differently for each polygon.
   ====================*/
+/* I ASSUME SRAND() HAS BEEN DONE! */
 void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
-
+  int t,m,b; // indices of top, middle, and bottom points from polygon
+  color c;
+  c.red = rand() % 256;
+  c.green = rand() % 256;
+  c.blue = rand() % 256;
 }
 
 /*======== void add_polygon() ==========
