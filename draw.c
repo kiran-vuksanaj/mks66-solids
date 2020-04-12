@@ -22,10 +22,50 @@
 /* I ASSUME SRAND() HAS BEEN DONE! */
 void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   int t,m,b; // indices of top, middle, and bottom points from polygon
+  /* (this is prbly extra) assume random top middle and bottom, then insertion sort them into place */
+  int swap;
+  t = i; m = i+1; b = i+2;
+  if( points->m[1][t] < points->m[1][m] ){
+	swap = t;
+	t = m;
+	m = swap;
+  }
+  if( points->m[1][m] < points->m[1][b] ){
+	swap = m;
+	m = b;
+	b = swap;
+	if( points->m[1][t] < points->m[1][m] ){
+	  swap = t;
+	  t = m;
+	  m = swap;
+	}
+  }
+  /* printf("top: (%lf,%lf); middle: (%lf,%lf); bottom: (%lf,%lf)\n",points->m[0][t],points->m[1][t],points->m[0][m],points->m[1][m],points->m[0][b],points->m[1][b]); */
+  /* random color for each polygon */
   color c;
   c.red = rand() % 256;
   c.green = rand() % 256;
   c.blue = rand() % 256;
+
+  double x0,x1;
+  x0 = points->m[0][b];
+  x1 = points->m[0][b];
+
+  int y = points->m[1][b];
+
+  double dx0, dx1L, dx1U;
+  dx0 = ( points->m[0][t] - points->m[0][b] ) / (points->m[1][t] - points->m[1][b] );
+  dx1L =( points->m[0][m] - points->m[0][b] ) / (points->m[1][m] - points->m[1][b] );
+  dx1U =( points->m[0][t] - points->m[0][m] ) / (points->m[1][t] - points->m[1][m] );
+  while( y < points->m[1][t] ) {
+	printf("zoobie doobie y=%d, yT = %lf\n",y,points->m[1][t]);
+	draw_line( x0, y, 0, x1, y, 0, s, zb, c ); // it doesnt matter what z is! doesnt even get used
+	y++;
+	x0 += dx0;
+	if( y >= points->m[1][m] ) x1 += dx1U;
+	else                       x1 += dx1L;
+  }
+  printf("completed!\n");
 }
 
 /*======== void add_polygon() ==========
@@ -75,7 +115,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
     normal = calculate_normal(polygons, point);
 
     if ( normal[2] > 0 ) {
-
+	  scanline_convert(polygons,point,s,zb);
       draw_line( polygons->m[0][point],
                  polygons->m[1][point],
                  polygons->m[2][point],
@@ -117,12 +157,12 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
 void add_box( struct matrix *polygons,
               double x, double y, double z,
               double width, double height, double depth ) {
-  double x0, y0, z0, x1, y1, z1;
-  x0 = x;
+  double x1, y1, z1;
+  /* x0 = x; */
   x1 = x+width;
-  y0 = y;
+  /* y0 = y; */
   y1 = y-height;
-  z0 = z;
+  /* z0 = z; */
   z1 = z-depth;
 
 
