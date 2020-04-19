@@ -646,10 +646,11 @@ void draw_line(int x0, int y0, double z0,
       loop_end = y;
     }
   }
-
+  double dz = (z1 - z0) / (loop_end - loop_start);
+  double z = z0;
   while ( loop_start < loop_end ) {
 
-    plot( s, zb, c, x, y, 0);
+    plot( s, zb, c, x, y, z);
     if ( (wide && ((A > 0 && d > 0) ||
                    (A < 0 && d < 0)))
          ||
@@ -665,6 +666,7 @@ void draw_line(int x0, int y0, double z0,
       d+= d_east;
     }
     loop_start++;
+	z += dz;
   } //end drawing loop
   plot( s, zb, c, x1, y1, 0 );
 } //end draw_line
