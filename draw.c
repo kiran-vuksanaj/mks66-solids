@@ -55,18 +55,32 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
 	/* printf("flat bottom!\n"); */
   }
   int y = points->m[1][b];
-
+  double z0,z1;
+  z0 = points->m[2][b];
+  z1 = points->m[2][b];
+  
   double dx0, dx1L, dx1U;
   dx0 = ( points->m[0][t] - points->m[0][b] ) / (points->m[1][t] - points->m[1][b] );
   dx1L =( points->m[0][m] - points->m[0][b] ) / (points->m[1][m] - points->m[1][b] );
   dx1U =( points->m[0][t] - points->m[0][m] ) / (points->m[1][t] - points->m[1][m] );
+  double dz0, dz1L, dz1U;
+  dz0 = ( points->m[2][t] - points->m[2][b] ) / (points->m[1][t] - points->m[1][b] );
+  dz1L= ( points->m[2][m] - points->m[2][b] ) / (points->m[1][m] - points->m[1][b] );
+  dz1U= ( points->m[2][t] - points->m[2][m] ) / (points->m[1][t] - points->m[1][m] );
   while( y < points->m[1][t] ) {
 	/* printf("zoobie doobie y=%d, yT = %lf\n",y,points->m[1][t]); */
-	draw_line( x0, y, 0, x1, y, 0, s, zb, c ); // it doesnt matter what z is! doesnt even get used
+	draw_line( x0, y, z0, x1, y, z1, s, zb, c );
 	y++;
 	x0 += dx0;
-	if( y >= points->m[1][m] ) x1 += dx1U;
-	else                       x1 += dx1L;
+	z0 += dz0;
+	if( y >= points->m[1][m] ) {
+	  x1 += dx1U;
+	  z1 += dz1U;
+	}
+	else{
+	  x1 += dx1L;
+	  z1 += dz1U;
+	}
   }
   /* printf("completed!\n"); */
 }
