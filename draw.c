@@ -43,9 +43,9 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zbuf ) {
   /* printf("top: (%lf,%lf); middle: (%lf,%lf); bottom: (%lf,%lf)\n",points->m[0][t],points->m[1][t],points->m[0][m],points->m[1][m],points->m[0][b],points->m[1][b]); */
   /* random color for each polygon */
   color c;
-  c.red = rand() % 256;
-  c.green = rand() % 256;
-  c.blue = rand() % 256;
+  c.red = rand() % 192;
+  c.green = rand() % 192;
+  c.blue = rand() % 192;
 
   double xb,yb,zb,xm,ym,zm,xt,yt,zt;
   xb = points->m[0][b];
@@ -61,7 +61,7 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zbuf ) {
   double x0,x1;
   x0 = xb;
 
-  short debug_print = 1;
+  short debug_print = 0;
 
   int y = (int)yb;
   double z0,z1;
