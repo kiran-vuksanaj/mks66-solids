@@ -20,7 +20,7 @@
   Color should be set differently for each polygon.
   ====================*/
 /* I ASSUME SRAND() HAS BEEN DONE! */
-void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
+void scanline_convert( struct matrix *points, int i, screen s, zbuffer zbuf ) {
   int t,m,b; // indices of top, middle, and bottom points from polygon
   /* (this is prbly extra) assume random top middle and bottom, then insertion sort them into place */
   int swap;
@@ -47,39 +47,66 @@ void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
   c.green = rand() % 256;
   c.blue = rand() % 256;
 
-  double x0,x1;
-  x0 = points->m[0][b];
-  x1 = points->m[0][b];
-  if( (int)points->m[0][b] == (int)points->m[0][m] ){
-	x1 = points->m[0][m];
-	printf("flat bottom!\n");
-  }
-  int y = points->m[1][b];
-  double z0,z1;
-  z0 = points->m[2][b];
-  z1 = points->m[2][b];
+  double xb,yb,zb,xm,ym,zm,xt,yt,zt;
+  xb = points->m[0][b];
+  yb = points->m[1][b];
+  zb = points->m[2][b];
+  xm = points->m[0][m];
+  ym = points->m[1][m];
+  zm = points->m[2][m];
+  xt = points->m[0][t];
+  yt = points->m[1][t];
+  zt = points->m[2][t];
   
-  double dx0, dx1L, dx1U;
-  dx0 = ( points->m[0][t] - points->m[0][b] ) / (points->m[1][t] - points->m[1][b] );
-  dx1L =( points->m[0][m] - points->m[0][b] ) / (points->m[1][m] - points->m[1][b] );
-  dx1U =( points->m[0][t] - points->m[0][m] ) / (points->m[1][t] - points->m[1][m] );
-  double dz0, dz1L, dz1U;
-  dz0 = ( points->m[2][t] - points->m[2][b] ) / (points->m[1][t] - points->m[1][b] );
-  dz1L= ( points->m[2][m] - points->m[2][b] ) / (points->m[1][m] - points->m[1][b] );
-  dz1U= ( points->m[2][t] - points->m[2][m] ) / (points->m[1][t] - points->m[1][m] );
+  double x0,x1;
+  x0 = xb;
+
+  short debug_print = 1;
+
+  int y = (int)yb;
+  double z0,z1;
+  z0 = zb;
+
+  short flat_y = 0;
+  if(yb == ym) flat_y = 1;
+  if(ym == yt) flat_y = 2;
+  double dx0, dx1L, dx1U, dx1;
+  dx0 = (xt - xb) / (yt - yb);
+  dx1L = (xm - xb) / (ym - yb);
+  dx1U = (xt - xm) / (yt - ym);
+
+  if(debug_print) printf("yvals: b=%lf, m=%lf, t=%lf\n\t",yb,ym,yt);
+  if(debug_print) printf("dx0 = %lf, dx1L = %lf, dx1U = %lf;\n",dx0,dx1L,dx1U);
+  if(debug_print) printf("\tflat_y = %hd\n",flat_y);
+  double dz0, dz1L, dz1U, dz1;
+  dz0 = (zt - zb) / (yt - yb);
+  dz1L = (zm - zb) / (ym - yb);
+  dz1U = (zt - zm) / (yt - ym);
+  if(flat_y == 1){
+	x1 = xm;
+	dx1 = dx1U;
+	z1 = zm;
+	dz1 = dz1U;
+  }else{
+	x1 = xb;
+	dx1 = dx1L;
+	z1 = zb;
+	dz1 = dz1L;
+  }
   while( y < points->m[1][t] ) {
 	/* printf("zoobie doobie y=%d, yT = %lf\n",y,points->m[1][t]); */
-	draw_line( x0, y, z0, x1, y, z1, s, zb, c );
+	draw_line( x0, y, z0, x1, y, z1, s, zbuf, c );
+	/* if( y%10 == 0 ) display(s); */
 	y++;
 	x0 += dx0;
+	x1 += dx1;
 	z0 += dz0;
-	if( y >= points->m[1][m] ) {
-	  x1 += dx1U;
-	  z1 += dz1U;
-	}
-	else{
-	  x1 += dx1L;
-	  z1 += dz1L;
+	z1 += dz1;
+	if( !flat_y && y == (int)ym ){
+	  dx1 = dx1U;
+	  x1 = xm;
+	  dz1 = dz1U;
+	  z1 = zm;
 	}
   }
   /* printf("completed!\n"); */
@@ -154,6 +181,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
                  polygons->m[1][point+2],
                  polygons->m[2][point+2],
                  s, zb, c);
+	  display(s);
     }
   }
 }
