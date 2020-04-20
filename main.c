@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   /* print_matrix(make_rotZ(M_PI/4)); */
   /* printf("\n"); */
 
-srand( 10);
+  srand( time(NULL) );
 
   if ( argc == 2 )
     parse_file( argv[1], csystems, edges, polygons, s, zb );

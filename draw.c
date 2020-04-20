@@ -182,7 +182,7 @@ void draw_polygons( struct matrix *polygons, screen s, zbuffer zb, color c ) {
       /*            polygons->m[2][point+2], */
       /*            s, zb, c); */
 	  /* display(s); */
-    }
+	}
   }
 }
 
@@ -625,7 +625,7 @@ void draw_line(int x0, int y0, double z0,
                screen s, zbuffer zb, color c) {
 
 
-
+  /* if(y1 != y0) printf("non-flat line!\n"); */
   int x, y, d, A, B;
   int dy_east, dy_northeast, dx_east, dx_northeast, d_east, d_northeast;
   int loop_start, loop_end;
